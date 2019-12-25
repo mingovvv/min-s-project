@@ -1,18 +1,22 @@
 package com.minproject.web;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.minproject.domain.User;
+import com.minproject.domain.UserRepository;
 
 @Controller
+@RequestMapping("/users")
 public class UserController {
-
-	private List<User> userList = new ArrayList<User>();
 	
+	@Autowired
+	private UserRepository userRepository;
 	// step1 : 파라미터 인자를 하나씩 받는 방법
 
 //	@PostMapping("/create")
@@ -22,16 +26,35 @@ public class UserController {
 //	}
 
 	// step2 : 인자를 모델로 만들어서 한번에 받는 방법
-	@PostMapping("/create")
+	@PostMapping("")
 	public String create(User user) {
-		System.out.println(user);
-		userList.add(user);
-		return "redirect:/list";  
+		userRepository.save(user);
+		return "redirect:/users";  
 	}
 	
-	@GetMapping("/list")
+	@GetMapping("")
 	public String getUserList(Model model) {
-		model.addAttribute("userList", userList);
-		return "list";
+		model.addAttribute("users", userRepository.findAll());
+		return "user/list";
+	}
+	
+	@GetMapping("/form")
+	public String form() {
+		return "user/form";
+	}
+	
+	// 수정 get
+	@GetMapping("/{id}/form")
+	public String updateForm(@PathVariable Long id, Model model) {
+		model.addAttribute("user", userRepository.getOne(id));
+		return "user/updateForm";
+	}
+	
+	// 수정 post
+	@PostMapping("/{id}")
+	public String update(@PathVariable Long id, User user) {
+		user.setRowNum(id);
+		userRepository.save(user);
+		return "redirect:/users";
 	}
 }
