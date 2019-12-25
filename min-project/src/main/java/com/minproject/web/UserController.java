@@ -57,4 +57,10 @@ public class UserController {
 		userRepository.save(user);
 		return "redirect:/users";
 	}
+	
+	// 로그인 get
+	@GetMapping("/login")
+	public String updateForm() {
+		return "user/login";
+	}
 }
