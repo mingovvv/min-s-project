@@ -1,10 +1,7 @@
 package com.minproject.domain;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -15,34 +12,33 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 
 @Entity
-public class Question {
-	
+public class Answer {
 	@Id
 	private String idx;
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long rowNum;
 	
 	@ManyToOne
-	@JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
+	@JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
 	private User user;
 	
-	private String title;
+	@ManyToOne
+	@JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_question"))
+	private Question question;
+	
 	@Lob
 	private String contents;
 	private LocalDateTime date;
 	
-	@OneToMany(mappedBy = "question")
-	@OrderBy("date ASC")
-	private List<Answer> answers;
+	public Answer() {
+	}
 	
 	public String getFormattedDate() {
 		return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 	}
-	
+
 	public String getIdx() {
 		return idx;
 	}
@@ -58,21 +54,13 @@ public class Question {
 	public void setRowNum(long rowNum) {
 		this.rowNum = rowNum;
 	}
-	
-	public User getUserId() {
+
+	public User getUser() {
 		return user;
 	}
 
-	public void setUserId(User userId) {
-		this.user = userId;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public String getContents() {
@@ -83,14 +71,6 @@ public class Question {
 		this.contents = contents;
 	}
 
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
 	public LocalDateTime getDate() {
 		return date;
 	}
@@ -99,21 +79,19 @@ public class Question {
 		this.date = date;
 	}
 
-	public List<Answer> getAnswers() {
-		return answers;
+	public Question getQuestion() {
+		return question;
 	}
 
-	public void setAnswers(List<Answer> answers) {
-		this.answers = answers;
+	public void setQuestion(Question question) {
+		this.question = question;
 	}
 
-	public void update(String updatedTitle, String updatedContents) {
-		title = updatedTitle;
-		contents = updatedContents;
-	}
 
-	public boolean isSameUser(User loginUser) {
-		return user.equals(loginUser);
+	@Override
+	public String toString() {
+		return "Answer [idx=" + idx + ", rowNum=" + rowNum + ", user=" + user + ", question=" + question + ", contents="
+				+ contents + ", date=" + date + "]";
 	}
 
 	@Override
@@ -132,7 +110,7 @@ public class Question {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Question other = (Question) obj;
+		Answer other = (Answer) obj;
 		if (idx == null) {
 			if (other.idx != null)
 				return false;
@@ -141,17 +119,12 @@ public class Question {
 		return true;
 	}
 
-	public void setUnit(User user) {
+	public void setUnit(User user, Question question) {
 		this.user = user;
+		this.question = question;
 		idx = UUID.randomUUID().toString();
 		date = LocalDateTime.now();
 	}
 	
-	@Override
-	public String toString() {
-		return "Question [idx=" + idx + ", rowNum=" + rowNum + ", user=" + user + ", title=" + title + ", contents="
-				+ contents + ", date=" + date + ", answers=" + answers + "]";
-	}
-
-
+	
 }
