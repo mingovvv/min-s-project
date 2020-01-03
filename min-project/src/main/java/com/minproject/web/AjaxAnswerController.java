@@ -47,15 +47,6 @@ public class AjaxAnswerController {
 		return answerRepository.save(answer);
 	}
 	
-	@PostMapping("/update")
-	public Answer update(@PathVariable String idx, HttpSession session, Answer answer) {
-		// 로그인 되어있는지 여부
-		if(!HttpSessionUtils.isLoginUser(session)) {
-			return null;
-		}
-		return null;
-	}
-	
 	@DeleteMapping("/{answerId}/delete")
 	public Object delete(@PathVariable String idx, @PathVariable String answerId, HttpSession session) {
 		
@@ -76,11 +67,11 @@ public class AjaxAnswerController {
 		question.deleteAnswer();
 		questionRepository.save(question);
 		
-		Map<String, Object> a = new HashMap<String, Object>();
-		a.put("result", Result.success());
-		a.put("answer", answer);
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("result", Result.success());
+		result.put("answer", answer);
 		
-		return a;
+		return result;
 	}
 	
 }
