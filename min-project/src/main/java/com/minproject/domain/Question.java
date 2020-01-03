@@ -1,10 +1,8 @@
 package com.minproject.domain;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import javax.persistence.Entity;
@@ -18,31 +16,55 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
 public class Question {
-	
+
 	@Id
+	@JsonProperty
 	private String idx;
+
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonProperty
 	private long rowNum;
+
+
+	@JsonProperty
+	private String title;
+
+	@JsonProperty
+	@Lob
+	private String contents;
+
+	@JsonProperty
+	private LocalDateTime date;
 	
 	@ManyToOne
 	@JoinColumn(foreignKey = @ForeignKey(name = "fk_question_writer"))
+	@JsonManagedReference
+	@JsonProperty
 	private User user;
-	
-	private String title;
-	@Lob
-	private String contents;
-	private LocalDateTime date;
-	
+
+	@JsonProperty
+	@JsonBackReference
 	@OneToMany(mappedBy = "question")
 	@OrderBy("date ASC")
 	private List<Answer> answers;
 	
-	public String getFormattedDate() {
-		return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	@JsonProperty
+	private long countOfAnswer;
+
+	public String getTitle() {
+		return title;
 	}
-	
+
+	public String getContents() {
+		return contents;
+	}
+
 	public String getIdx() {
 		return idx;
 	}
@@ -57,30 +79,6 @@ public class Question {
 
 	public void setRowNum(long rowNum) {
 		this.rowNum = rowNum;
-	}
-	
-	public User getUserId() {
-		return user;
-	}
-
-	public void setUserId(User userId) {
-		this.user = userId;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getContents() {
-		return contents;
-	}
-
-	public void setContents(String contents) {
-		this.contents = contents;
 	}
 
 	public User getUser() {
@@ -107,11 +105,23 @@ public class Question {
 		this.answers = answers;
 	}
 
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setContents(String contents) {
+		this.contents = contents;
+	}
+
 	public void update(String updatedTitle, String updatedContents) {
 		title = updatedTitle;
 		contents = updatedContents;
 	}
 
+	public String getFormattedDate() {
+		return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	}
+	
 	public boolean isSameUser(User loginUser) {
 		return user.equals(loginUser);
 	}
@@ -146,12 +156,13 @@ public class Question {
 		idx = UUID.randomUUID().toString();
 		date = LocalDateTime.now();
 	}
-	
-	@Override
-	public String toString() {
-		return "Question [idx=" + idx + ", rowNum=" + rowNum + ", user=" + user + ", title=" + title + ", contents="
-				+ contents + ", date=" + date + ", answers=" + answers + "]";
+
+	public void addAnswer() {
+		countOfAnswer++;
 	}
 
+	public void deleteAnswer() {
+		countOfAnswer--;
+	}
 
 }

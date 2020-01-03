@@ -23,6 +23,7 @@ public class UserController {
 	// 등록 post
 	@PostMapping("")
 	public String create(User user) {
+		user.setUnit();
 		userRepository.save(user);
 		return "redirect:/users";  
 	}
@@ -41,8 +42,8 @@ public class UserController {
 	}
 	
 	// 수정 get
-	@GetMapping("/{rowNum}/form")
-	public String updateForm(@PathVariable Long rowNum, Model model, HttpSession session) {
+	@GetMapping("/{idx}/form")
+	public String updateForm(@PathVariable String idx, Model model, HttpSession session) {
 		
 		// url을 통한 악의적인 수정 접근
 		
@@ -56,10 +57,10 @@ public class UserController {
 		User sessionedUser = HttpSessionUtils.getUserFromSession(session);
 		
 		// 2-1. 로그인 session에 담긴 정보가 있다면 session id값과 url {id}값의 동일 여부 확인 
-		if(!rowNum.equals(sessionedUser.getRowNum())) {
+		if(!idx.equals(sessionedUser.getIdx())) {
 			throw new IllegalStateException("다른 회원의 정보를 수정할 수 없습니다.");
 		}else {
-			model.addAttribute("user", userRepository.getOne(rowNum));
+			model.addAttribute("user", userRepository.getOne(idx));
 		}
 		
 		// 2-2. 로그인 session에 담긴 정보가 있다면 개인정보 수정 시, sessioned에 담긴 id값으로 수정
@@ -69,8 +70,8 @@ public class UserController {
 	}
 	
 	// 수정 post
-	@PostMapping("/{rowNum}")
-	public String update(@PathVariable Long rowNum, User updateduser, HttpSession session) {
+	@PostMapping("/{idx}")
+	public String update(@PathVariable String idx, User updateduser, HttpSession session) {
 		
 		// Refactoring
 		// 1. 로그인 session에 담긴 정보가 없다면 login-page 이동
@@ -81,11 +82,11 @@ public class UserController {
 		// Refactoring
 		User sessionedUser = HttpSessionUtils.getUserFromSession(session);
 		
-		if(!rowNum.equals(sessionedUser.getRowNum())) {
+		if(!idx.equals(sessionedUser.getIdx())) {
 			throw new IllegalStateException("다른 회원의 정보를 수정할 수 없습니다.");
 		}
 		
-		updateduser.setRowNum(rowNum);
+		updateduser.setIdx(idx);
 		userRepository.save(updateduser);
 		return "redirect:/users";
 	}

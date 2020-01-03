@@ -13,31 +13,43 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
 public class Answer {
-	@Id
-	private String idx;
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long rowNum;
 	
+	@Id
+	@JsonProperty
+	private String idx;
+
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonProperty
+	private long rowNum;
+
 	@ManyToOne
 	@JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_writer"))
+	@JsonManagedReference
+	@JsonProperty
 	private User user;
-	
+
 	@ManyToOne
 	@JoinColumn(foreignKey = @ForeignKey(name = "fk_answer_question"))
+	@JsonManagedReference
+	@JsonProperty
 	private Question question;
-	
+
 	@Lob
+	@JsonProperty
 	private String contents;
+
+	@JsonProperty
 	private LocalDateTime date;
-	
+
 	public Answer() {
 	}
-	
-	public String getFormattedDate() {
-		return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-	}
+
 
 	public String getIdx() {
 		return idx;
@@ -71,22 +83,25 @@ public class Answer {
 		this.contents = contents;
 	}
 
-	public LocalDateTime getDate() {
-		return date;
-	}
-
 	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
-
+	
 	public Question getQuestion() {
 		return question;
 	}
-
+	
 	public void setQuestion(Question question) {
 		this.question = question;
 	}
+	
+	public String getFormattedDate() {
+		return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+	}
 
+	public LocalDateTime getDate() {
+		return date;
+	}
 
 	@Override
 	public String toString() {
@@ -125,6 +140,10 @@ public class Answer {
 		idx = UUID.randomUUID().toString();
 		date = LocalDateTime.now();
 	}
-	
-	
+
+
+	public boolean isSameUser(User loginUser) {
+		return user.equals(loginUser);
+	}
+
 }

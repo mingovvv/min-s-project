@@ -47,7 +47,7 @@ public class QuestionController {
 	// 질문 상세 보기
 	@GetMapping("{idx}")
 	public String detail(@PathVariable String idx, Model model) {
-		model.addAttribute("question",questionRepository.getOne(idx));
+		model.addAttribute("question",questionRepository.findById(idx).get());
 		return "qna/detail";
 	}
 	
